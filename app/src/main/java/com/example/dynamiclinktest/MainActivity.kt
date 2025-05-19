@@ -11,7 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.example.dynamiclinktest.ui.theme.DynamicLinkTestTheme
+import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,11 +24,29 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DynamicLinkTestTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = Home
+                ) {
+                    composable<Home> {
+                        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                            Greeting(
+                                name = "Android",
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                    }
+
+                    composable<Detail>(
+                        deepLinks = listOf(
+                            navDeepLink<Detail>(basePath = "http://algosketch.shop")
+                        )
+                    ) {
+                        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                            Text(modifier = Modifier.padding(innerPadding), text = "Detail Screen")
+                        }
+                    }
                 }
             }
         }
@@ -45,3 +68,9 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+@Serializable
+data object Home
+
+@Serializable
+data object Detail
